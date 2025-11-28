@@ -1,0 +1,20 @@
+{
+  "name": "google-chat-group-manager",
+  "version": "2.8.1",
+  "description": "Bot de Google Chat para gestionar grupos de Google Workspace, incluyendo solicitud de manager y resolucion de Display Names.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/firestore": "^7.8.0",
+    "@google-cloud/secret-manager": "^5.5.0",
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "googleapis": "^137.1.0",
+    "js-base64": "^3.7.7"
+  }
+}
