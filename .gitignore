@@ -11,3 +11,4 @@ crash.*.log
 # Text editors
 *.log
 
+Terraform/terraform-key.json
