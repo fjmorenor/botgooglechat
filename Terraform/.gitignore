@@ -1,0 +1,25 @@
+# Archivos de Terraform que DEBEN ser ignorados
+# ----------------------------------------------
+
+# Clave de Autenticación (¡CRÍTICO!)
+terraform-key.json
+*.key
+*.pem
+
+# Archivos de estado de Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Archivos de configuración local (CRÍTICO)
+*.tfvars
+terraform.tfvars
+
+# Archivos de logs y del sistema
+*.log
+.DS_Store
+Thumbs.db
+
+# Ignorar dependencias de Node.js si se instalan accidentalmente aquí
+node_modules/
