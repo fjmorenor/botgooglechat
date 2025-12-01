@@ -8,19 +8,31 @@ The project combines Google Cloud's power: **Gemini AI** for understanding natur
 
 ## Core Capabilities
 
-This bot delivers secure and efficient management of your environment:
+This bot is engineered for secure, efficient management across your domain:
 
-* **Conversational Administration:** Users request actions using natural sentences (e.g., "add user@ to group.test@"). The **Gemini AI** interprets the intent behind the text.
+* **Conversational Administration:** Users can simply type what they need (e.g., "add user@ to group.test@"). The **Gemini AI** interprets the intent behind the text.
 * **Security First:** The sensitive Service Account keys are loaded securely at runtime via **Google Secret Manager (GSM)**, ensuring they are never exposed in code or variables.
-* **Flexible Resolution:** The bot can find users and groups by accepting full emails, partial emails, or display names (e.g., "Juan Pérez").
+* **Flexible Resolution:** The bot can find users and groups by accepting full emails, partial emails, or simply their display names (e.g., "Juan Pérez").
 * **Quick Support (FAQs):** It answers support questions using a two-part strategy: first, a fast, direct lookup against the knowledge base, and then a **semantic fallback with Gemini** for complex queries.
 * **Permission Control:** It enforces organizational rules, allowing group management only to approved **Managers, Owners**, or the Global Administrator.
 
 ---
 
-## Technology Stack and Project Flow
+## 📷 Bot Interface Preview
 
-The bot is designed on a modern, cloud-native architecture ready for serverless deployment.
+Here is a look at the command menu and the interaction workflow within Google Chat.
+
+### Quick Command Menu
+![Screenshot showing the main command menu and options available to the user in Google Chat](images/menu.png)
+
+### Command Dropdown Interaction
+![Screenshot illustrating the use of the command dropdown menu in Google Chat](images/desplegable.png)
+
+---
+
+## Technology Stack
+
+The bot is designed on a modern, cloud-native architecture ready for serverless deployment:
 
 | Technology | Role in the Project |
 | :--- | :--- |
@@ -29,44 +41,6 @@ The bot is designed on a modern, cloud-native architecture ready for serverless 
 | **Google Secret Manager** | Secure handling of the Admin key used for domain delegation. |
 | **Google Firestore** | Dynamically stores the AI prompts and the structured FAQ database. |
 | **Gemini API** | The AI engine for natural language understanding and semantic search. |
-
----
-
-## 🔒 Deployment and Security Requirements
-
-### IAM Roles
-
-To enable the bot and Google Cloud services to function, the following roles must be assigned to the relevant Service Accounts (SAs):
-
-#### 1. Primary Execution Service Account (The Bot)
-
-This account runs your application and needs permissions to manage groups, access data, and handle secrets.
-
-| IAM Role | Purpose |
-| :--- | :--- |
-| **Cloud Datastore User** | Allows read/write access to the Firestore database. |
-| **Secret Manager Secret Accessor** | Allows accessing the Admin key stored in Secret Manager. |
-| **Service Usage Consumer** | Allows the bot to consume quotas and verify service status. |
-| **Service Account Token Creator** | Required for the bot to impersonate its own identity (essential for Domain-Wide Delegation). |
-| **Logs Writer** | Grants access to write application logs. |
-
-#### 2. Google-Managed Service Accounts (For Platform and AI Services)
-
-| Service Account | IAM Roles Required |
-| :--- | :--- |
-| **Compute Engine Default SA** (`[PROJECT_NUMBER]-compute@...`) | **Vertex AI User** |
-| **Vertex AI Service Agent** (`service-PROJECT_ID@gcp-sa-aiplatform...`) | **Vertex AI Administrator** |
-| **Vertex AI Express SA** (`service-express@[PROJECT_ID].iam.gserviceaccount.com`) | **Vertex AI Platform Express User** |
-| **Artifact Registry SA** (`service-PROJECT_ID@containerregistry.iam.gserviceaccount.com`) | **Artifact Registry Writer** (Necessary for deploying container images). |
-
-### Google Workspace Admin Setup (Domain Delegation)
-
-**This is critical for group management functionality.** Before deployment, you must configure the following actions in the Google Workspace Admin Console to grant the Service Account permission to manage users and groups:
-
-1.  **Enable DWD:** Ensure **Domain-Wide Delegation** is enabled in your Workspace environment.
-2.  **Delegate API Scopes:** Navigate to Security > Access and data control > API controls > Domain-wide Delegation.
-3.  **Add Service Account:** Register your primary Execution Service Account's Client ID.
-4.  **Authorize Scopes:** Authorize the required Google Admin SDK scopes (listed in `index.js`) for delegation.
 
 ---
 
