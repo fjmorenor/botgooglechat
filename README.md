@@ -1,59 +1,56 @@
 # Bot Omega: Google Workspace Group Management Agent
 
-Bot Omega is a resilient and powerful chat tool designed to simplify and automate critical administrative tasks for **Google Workspace Groups** (such as adding/removing members and changing roles). It also serves as a technical assistant, providing instant answers to frequently asked questions (FAQs) using Artificial Intelligence.
+This is **Bot Omega**, a resilient chat tool designed to handle daily **Google Workspace Group administration** tasks (like managing members and roles) and act as a technical assistant by providing instant answers to FAQs.
 
-The project is built on core Google Cloud technologies, including the Admin SDK, Secret Manager for secure credential management, and the Gemini API for natural language understanding.
-
----
-
-## Core Features
-
-This bot offers powerful and secure management of your Workspace environment:
-
-* **Natural Language Administration:** Users can request actions using everyday phrases (e.g., "add user@ to group.test@") thanks to intent recognition powered by the **Gemini AI**.
-* **Credential Security:** Sensitive service account keys are never stored in code or exposed environment variables. They are loaded securely at runtime via **Google Secret Manager (GSM)**.
-* **Flexible Resolution:** The bot can find users and groups using full emails, partial emails, or display names (e.g., "Juan Pérez").
-* **Dual FAQ System:** For support queries, the bot uses ultra-fast **Deterministic Search** against a Firestore knowledge base and falls back to **Gemini's semantic search** if required.
-* **Permission Control:** Strict access rules are applied. Only Global Admins, Owners, or designated Managers can modify group memberships.
+The project combines Google Cloud's power: **Gemini AI** for understanding natural language and the precise execution capabilities of the **Admin SDK**.
 
 ---
 
-## Structure and Technology
+## Core Capabilities
 
-The bot is built on a Node.js architecture ready for serverless deployment (such as Google Cloud Run):
+This bot delivers secure and efficient management of your environment:
 
-| Technology | Purpose |
+* **Conversational Administration:** Users request actions using natural sentences (e.g., "add user@ to group.test@"). The **Gemini AI** interprets the intent behind the text.
+* **Security First:** The sensitive Service Account keys are loaded securely at runtime via **Google Secret Manager (GSM)**, ensuring they are never exposed in code or variables.
+* **Flexible Resolution:** The bot can find users and groups by accepting full emails, partial emails, or display names (e.g., "Juan Pérez").
+* **Quick Support (FAQs):** It answers support questions using a two-part strategy: first, a fast, direct lookup against the knowledge base, and then a **semantic fallback with Gemini** for complex queries.
+* **Permission Control:** It enforces organizational rules, allowing group management only to approved **Managers, Owners**, or the Global Administrator.
+
+---
+
+## Technology Stack and Project Flow
+
+The bot is designed on a modern, cloud-native architecture ready for serverless deployment.
+
+| Technology | Role in the Project |
 | :--- | :--- |
-| **Node.js / Express** | Runtime environment and web server managing Google Chat events. |
-| **Google Admin SDK** | Primary tool for managing users and groups within Google Workspace. |
-| **Google Secret Manager** | Securely stores and retrieves the Admin SDK Service Account credentials. |
-| **Google Firestore** | Dynamically loads AI prompts and the structured FAQ knowledge base. |
-| **Gemini API** | Used for Natural Language Understanding (NLU) and semantic search support. |
-| **Google Chat API** | Primary communication interface with the platform. |
+| **Node.js / Express** | Provides the execution environment and manages receiving chat events. |
+| **Google Admin SDK** | The core library for performing the actual user and group management in Workspace. |
+| **Google Secret Manager** | Secure handling of the Admin key used for domain delegation. |
+| **Google Firestore** | Dynamically stores the AI prompts and the structured FAQ database. |
+| **Gemini API** | The AI engine for natural language understanding and semantic search. |
 
 ---
 
-## 🚀 Setup and Deployment
+## 🔒 Deployment and Security Requirements
 
-### IAM Requirements (Necessary Roles)
+### IAM Roles
 
-To deploy and run the bot successfully, you must configure specific **Identity and Access Management (IAM)** roles for different Service Accounts (SAs) in your Google Cloud project.
+To enable the bot and Google Cloud services to function, the following roles must be assigned to the relevant Service Accounts (SAs):
 
-#### 1. Primary Execution Service Account (Your Bot)
+#### 1. Primary Execution Service Account (The Bot)
 
-This account runs your application (e.g., in Cloud Run) and needs permissions to manage groups, access data, and handle secrets.
+This account runs your application and needs permissions to manage groups, access data, and handle secrets.
 
 | IAM Role | Purpose |
 | :--- | :--- |
-| **Cloud Datastore User** | Allows read/write access to data in the Firestore database (`databasechat`). |
-| **Secret Manager Secret Accessor** | Allows access to the Admin SDK key stored in Secret Manager. |
+| **Cloud Datastore User** | Allows read/write access to the Firestore database. |
+| **Secret Manager Secret Accessor** | Allows accessing the Admin key stored in Secret Manager. |
 | **Service Usage Consumer** | Allows the bot to consume quotas and verify service status. |
-| **Service Account Token Creator** | Required if the bot needs to impersonate its own identity (essential for DWD). |
-| **Logs Writer** | Grants access to write application logs (fundamental for debugging). |
+| **Service Account Token Creator** | Required for the bot to impersonate its own identity (essential for Domain-Wide Delegation). |
+| **Logs Writer** | Grants access to write application logs. |
 
 #### 2. Google-Managed Service Accounts (For Platform and AI Services)
-
-These are Google-managed accounts that require permissions to run specific services used by the project. You must assign these roles manually in the **IAM & Admin** console.
 
 | Service Account | IAM Roles Required |
 | :--- | :--- |
@@ -62,40 +59,39 @@ These are Google-managed accounts that require permissions to run specific servi
 | **Vertex AI Express SA** (`service-express@[PROJECT_ID].iam.gserviceaccount.com`) | **Vertex AI Platform Express User** |
 | **Artifact Registry SA** (`service-PROJECT_ID@containerregistry.iam.gserviceaccount.com`) | **Artifact Registry Writer** (Necessary for deploying container images). |
 
-### Configuration Steps
+### Google Workspace Admin Setup (Domain Delegation)
 
-1.  **Secret Manager:** Store the Admin SDK Service Account JSON key in Secret Manager.
-2.  **Environment Variables (`.env`):** Define the required variables (like `GCP_PROJECT_ID`, `DOMAIN`, `GEMINI_API_KEY`, etc.) in your local `.env` file.
-3.  **Local Installation:**
-    ```bash
-    git clone [https://github.com/fjmorenor/botgooglechat.git](https://github.com/fjmorenor/botgooglechat.git)
-    cd botgooglechat
-    npm install
-    ```
+**This is critical for group management functionality.** Before deployment, you must configure the following actions in the Google Workspace Admin Console to grant the Service Account permission to manage users and groups:
+
+1.  **Enable DWD:** Ensure **Domain-Wide Delegation** is enabled in your Workspace environment.
+2.  **Delegate API Scopes:** Navigate to Security > Access and data control > API controls > Domain-wide Delegation.
+3.  **Add Service Account:** Register your primary Execution Service Account's Client ID.
+4.  **Authorize Scopes:** Authorize the required Google Admin SDK scopes (listed in `index.js`) for delegation.
 
 ---
 
-## 💬 Usage Examples
+## 💾 Firestore Configuration
 
-Users can interact in Google Chat using the following commands:
+### FAQ Data Structure
 
-| Action | Description | Quick Example |
-| :--- | :--- | :--- |
-| **Add** | Adds users to a group. | \`/add user@ to group.test@\` |
-| **Remove** | Removes users from a group. | \`/remove user@ from group.test@\` |
-| **Manager** | Promotes a member to Manager role. | \`/make user@ manager of group@\` |
-| **Members** | Displays all members of the group. | \`/members support@\` |
-| **Leave** | Removes yourself from the group. | \`/leave office.group@\` |
-| **MyGroups** | Displays groups you belong to. | \`/mygroups\` |
-| **Request Manager** | Formal request for Manager permissions. | \`/request manager of group.test@\` |
+The bot relies on a specific structure where the content is stored as a JSON string within a document.
 
----
+* **Collection:** `faq`
 
-## Security Notice
+**Configuration Process**
 
-This repository uses a `.gitignore` file to permanently exclude sensitive files like:
-* `*.tfvars` (Terraform variable files containing local paths or secrets).
-* `*.tfstate` (Terraform state files).
-* `.env` (Environment variable files).
+1.  Write your FAQ content following the JSON array format below.
+2.  In the Firestore console, create a collection named `faq`.
+3.  Create a new document and add the field **`faq_documentation`**. Paste the complete JSON content as a **String value**.
 
-Since the Git history has been thoroughly cleaned, the code is safe to be made public.
+```json
+[
+  {
+    "id": 1,
+    "category": "Access and Passwords",
+    "questions": ["How can I reset my password?", "I forgot my key."],
+    "keywords": ["reset", "password", "key"],
+    "standard_answer": "To reset your password, you must go to the self-service portal...",
+    "detailed_steps": ["Visit the company's web portal.", "Click on 'Forgot my password'."]
+  }
+]
