@@ -1,6 +1,6 @@
-# Bot Omega: Google Workspace Group Management Agent
+# Bot Bender: Google Workspace Group Management Agent
 
-This is **Bot Omega**, a resilient chat tool designed to handle daily **Google Workspace Group administration** tasks (like managing members and roles) and act as a technical assistant by providing instant answers to FAQs.
+This is **Bot Bender**, a resilient chat tool designed to handle daily **Google Workspace Group administration** tasks (like managing members and roles) and act as a technical assistant by providing instant answers to FAQs.
 
 The project combines Google Cloud's power: **Gemini AI** for understanding natural language and the precise execution capabilities of the **Admin SDK**.
 
